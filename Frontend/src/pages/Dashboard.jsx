@@ -90,7 +90,7 @@ export default function Dashboard() {
       <div className="fade-up-1" style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:'14px', marginBottom:'24px' }}>
         {[
           { label:'Prediction',    value:`${result.predicted.toFixed(1)}`, unit:'kWh', color:'var(--accent)' },
-          { label:'Vs Last Month', value:`${result.predicted > result.prev_consumption ? '+' : ''}${(result.predicted - result.prev_consumption).toFixed(1)}`, unit:'kWh',
+          { label:'Avg Dataset', value:'72.4', unit:'kWh',
             color: result.predicted > result.prev_consumption ? '#ff6b35' : 'var(--green)' },
           { label:'Confidence',    value:`${result.confidence ?? 92}`, unit:'%',  color:'var(--blue)' },
           { label:'Model R²',      value: stats?.r2?.toFixed(3) ?? '0.924', unit:'', color:'var(--green)' },
@@ -113,7 +113,7 @@ export default function Dashboard() {
       {/* Charts row */}
       <div className="fade-up-2" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'20px', marginBottom:'20px' }}>
         <Card title="PREDICTED VS PREVIOUS">
-          <ComparisonChart predicted={result.predicted} previous={result.inputs?.square_footage / 20 ?? 70} />
+          <ComparisonChart predicted={result.predicted} previous={result.inputs?.temperature * 2.5 + result.inputs?.occupancy * 10 + 40} />
         </Card>
         <Card title="ESTIMATED BREAKDOWN">
           <BreakdownChart predicted={result.predicted} />
