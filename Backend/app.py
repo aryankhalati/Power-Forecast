@@ -22,12 +22,7 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     # CORS — allow React dev server
-   CORS(app, resources={r'/api/*': {'origins': [
-    'http://localhost:5173',
-    'http://localhost:3000',
-    'https://power-forecast.vercel.app',
-    'https://power-forecast-lfqchjz3i-aryankhalatis-projects.vercel.app',
-]}})
+  CORS(app)
 
     # Init DB
     init_db(app)
