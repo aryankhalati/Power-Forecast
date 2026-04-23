@@ -26,7 +26,7 @@ def create_app():
     'http://localhost:5173',
     'http://localhost:3000',
     'https://power-forecast.vercel.app',
-    'https://power-forecast-aryankhalati.vercel.app',
+    'https://power-forecast-lfqchjz3i-aryankhalatis-projects.vercel.app',
 ]}})
 
     # Init DB
