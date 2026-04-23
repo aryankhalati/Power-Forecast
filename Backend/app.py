@@ -17,12 +17,12 @@ def create_app():
     app = Flask(__name__)
 
     # Config
-    app.config['SECRET_KEY']                  = os.getenv('SECRET_KEY', 'dev-secret')
-    app.config['SQLALCHEMY_DATABASE_URI']     = os.getenv('DATABASE_URL', 'sqlite:///powercast.db')
+    app.config['SECRET_KEY']                     = os.getenv('SECRET_KEY', 'dev-secret')
+    app.config['SQLALCHEMY_DATABASE_URI']        = os.getenv('DATABASE_URL', 'sqlite:///powercast.db')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-    # CORS — allow React dev server
-  CORS(app)
+    # CORS — allow all origins
+    CORS(app)
 
     # Init DB
     init_db(app)
