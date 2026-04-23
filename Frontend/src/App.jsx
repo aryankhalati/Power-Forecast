@@ -24,7 +24,7 @@ export default function App() {
         background:'var(--bg2)',
       }}>
         <span style={{ fontFamily:'var(--font-mono)', fontSize:'11px', color:'var(--text3)' }}>
-          ⚡ PowerCast — Linear Regression Energy Forecaster
+          ⚡ Power Forecast — Linear Regression Energy Forecaster
         </span>
         <span style={{ fontFamily:'var(--font-mono)', fontSize:'11px', color:'var(--text3)' }}>
           React + Flask + Chart.js

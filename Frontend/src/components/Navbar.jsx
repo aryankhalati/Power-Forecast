@@ -21,7 +21,7 @@ export default function Navbar() {
       <NavLink to="/" style={{ display:'flex', alignItems:'center', gap:'10px', textDecoration:'none' }}>
         <span style={{ color:'var(--accent)' }}><BoltIcon /></span>
         <span style={{ fontFamily:'var(--font-display)', fontSize:'1.5rem', letterSpacing:'0.05em', color:'var(--text)' }}>
-          POWER<span style={{ color:'var(--accent)' }}>CAST</span>
+         POWER <span style={{ color:'var(--accent)' }}>FORECAST</span>
         </span>
       </NavLink>
 
