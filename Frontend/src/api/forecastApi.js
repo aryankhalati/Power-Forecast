@@ -3,6 +3,7 @@ import axios from 'axios'
 const api = axios.create({
   baseURL: 'https://power-forecast.onrender.com/api',
   headers: { 'Content-Type': 'application/json' },
+  timeout: 30000,  // 30 seconds — gives Render time to wake up
 })
 
 export const predictConsumption = async (formData) => {
