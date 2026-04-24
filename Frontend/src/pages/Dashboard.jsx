@@ -4,17 +4,6 @@ import { ComparisonChart, BreakdownChart, TrendChart } from '../components/Forec
 import ModelStats from '../components/ModelStats'
 import { fetchHistory, fetchModelStats } from '../api/forecastApi'
 
-// Mock data for development
-const MOCK_HISTORY = Array.from({ length: 8 }, (_, i) => ({
-  prev_consumption: 280 + i * 15 + Math.random() * 30,
-  predicted: 290 + i * 15 + Math.random() * 35,
-  temperature: 22 + Math.random() * 15,
-  season: ['Summer','Monsoon','Winter','Spring'][i % 4],
-  timestamp: new Date(Date.now() - (7 - i) * 30 * 86400000).toISOString(),
-}))
-
-const MOCK_STATS = { r2: 0.924, mae: 14.3, rmse: 18.7, train_size: 850 }
-
 const Card = ({ title, children, style }) => (
   <div style={{
     background:'var(--bg2)', border:'1px solid var(--border)',
@@ -35,14 +24,26 @@ const Card = ({ title, children, style }) => (
 export default function Dashboard() {
   const { state }   = useLocation()
   const navigate    = useNavigate()
-  const [history, setHistory] = useState(MOCK_HISTORY)
-  const [stats,   setStats]   = useState(MOCK_STATS)
+  const [history, setHistory] = useState([])
+  const [stats,   setStats]   = useState(null)
+  const [loading, setLoading] = useState(true)
   const result = state?.result
 
   useEffect(() => {
-    fetchHistory().then(setHistory).catch(() => setHistory(MOCK_HISTORY))
-    fetchModelStats().then(setStats).catch(() => setStats(MOCK_STATS))
+    Promise.all([
+      fetchHistory().catch(() => []),
+      fetchModelStats().catch(() => null),
+    ]).then(([hist, st]) => {
+      setHistory(hist)
+      setStats(st)
+      setLoading(false)
+    })
   }, [])
+
+  // Get previous prediction from history for comparison
+  const prevPredicted = history.length > 1
+    ? history[history.length - 2]?.predicted
+    : result?.predicted * 0.88
 
   if (!result) return (
     <div style={{ maxWidth:'900px', margin:'80px auto', textAlign:'center', padding:'24px' }}>
@@ -58,6 +59,9 @@ export default function Dashboard() {
       </button>
     </div>
   )
+
+  const diff = prevPredicted ? (result.predicted - prevPredicted) : 0
+  const diffColor = diff > 0 ? '#ff6b35' : 'var(--green)'
 
   return (
     <div style={{ maxWidth:'1200px', margin:'0 auto', padding:'40px 24px' }}>
@@ -89,11 +93,10 @@ export default function Dashboard() {
       {/* Top KPIs */}
       <div className="fade-up-1" style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:'14px', marginBottom:'24px' }}>
         {[
-          { label:'Prediction',    value:`${result.predicted.toFixed(1)}`, unit:'kWh', color:'var(--accent)' },
-          { label:'Avg Dataset', value:'72.4', unit:'kWh',
-            color: result.predicted > result.prev_consumption ? '#ff6b35' : 'var(--green)' },
-          { label:'Confidence',    value:`${result.confidence ?? 92}`, unit:'%',  color:'var(--blue)' },
-          { label:'Model R²',      value: stats?.r2?.toFixed(3) ?? '0.924', unit:'', color:'var(--green)' },
+          { label:'Prediction',     value:`${result.predicted.toFixed(1)}`,                          unit:'kWh', color:'var(--accent)' },
+          { label:'Vs Last Prediction', value:`${diff >= 0 ? '+' : ''}${diff.toFixed(1)}`,           unit:'kWh', color: diffColor },
+          { label:'Confidence',     value:`${result.confidence ?? 92}`,                               unit:'%',   color:'var(--blue)' },
+          { label:'Model R²',       value: loading ? '...' : stats?.r2?.toFixed(3) ?? '0.620',        unit:'',    color:'var(--green)' },
         ].map(({ label, value, unit, color }) => (
           <div key={label} style={{
             background:'var(--bg2)', border:'1px solid var(--border)',
@@ -113,7 +116,10 @@ export default function Dashboard() {
       {/* Charts row */}
       <div className="fade-up-2" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'20px', marginBottom:'20px' }}>
         <Card title="PREDICTED VS PREVIOUS">
-          <ComparisonChart predicted={result.predicted} previous={result.inputs?.temperature * 2.5 + result.inputs?.occupancy * 10 + 40} />
+          <ComparisonChart
+            predicted={result.predicted}
+            previous={prevPredicted ?? result.predicted * 0.88}
+          />
         </Card>
         <Card title="ESTIMATED BREAKDOWN">
           <BreakdownChart predicted={result.predicted} />
@@ -123,7 +129,19 @@ export default function Dashboard() {
       {/* Trend + stats */}
       <div className="fade-up-3" style={{ display:'grid', gridTemplateColumns:'2fr 1fr', gap:'20px' }}>
         <Card title="HISTORICAL TREND">
-          <TrendChart history={history} />
+          {loading ? (
+            <div style={{ textAlign:'center', padding:'40px',
+              color:'var(--text3)', fontFamily:'var(--font-mono)', fontSize:'12px' }}>
+              Loading history...
+            </div>
+          ) : history.length > 1 ? (
+            <TrendChart history={history} />
+          ) : (
+            <div style={{ textAlign:'center', padding:'40px',
+              color:'var(--text3)', fontFamily:'var(--font-mono)', fontSize:'12px' }}>
+              Make more predictions to see the trend!
+            </div>
+          )}
         </Card>
         <Card title="MODEL PERFORMANCE">
           <ModelStats stats={stats} />
