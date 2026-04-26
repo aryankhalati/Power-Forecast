@@ -3,13 +3,7 @@ import { TrendChart } from '../components/ForecastChart'
 import HistoryTable from '../components/HistoryTable'
 import { fetchHistory } from '../api/forecastApi'
 
-const MOCK_HISTORY = Array.from({ length: 10 }, (_, i) => ({
-  prev_consumption: 260 + i * 12 + Math.random() * 40,
-  predicted: 270 + i * 11 + Math.random() * 38,
-  temperature: 20 + Math.random() * 18,
-  season: ['Summer','Monsoon','Winter','Spring','Autumn'][i % 5],
-  timestamp: new Date(Date.now() - (9 - i) * 28 * 86400000).toISOString(),
-}))
+
 
 export default function History() {
   const [history, setHistory] = useState([])
@@ -18,10 +12,10 @@ export default function History() {
   useEffect(() => {
     fetchHistory()
       .then(setHistory)
-      .catch(() => setHistory(MOCK_HISTORY))
+      .catch(() => setHistory([]))
       .finally(() => setLoading(false))
   }, [])
-
+  
   const avg = history.length
     ? (history.reduce((s, h) => s + h.predicted, 0) / history.length).toFixed(1)
     : '—'

@@ -59,17 +59,10 @@ export function TrendChart({ history }) {
     labels,
     datasets: [
       {
-        label: 'Actual',
-        data: history.map(h => h.prev_consumption),
-        borderColor: '#4fc3f7', backgroundColor: 'rgba(79,195,247,0.08)',
-        tension: 0.4, fill: true, pointRadius: 4, pointBackgroundColor: '#4fc3f7',
-      },
-      {
-        label: 'Predicted',
+        label: 'Predicted (kWh)',
         data: history.map(h => h.predicted),
-        borderColor: '#f0c040', backgroundColor: 'rgba(240,192,64,0.06)',
+        borderColor: '#f0c040', backgroundColor: 'rgba(240,192,64,0.08)',
         tension: 0.4, fill: true, pointRadius: 4, pointBackgroundColor: '#f0c040',
-        borderDash: [5, 3],
       },
     ],
   }
