@@ -22,12 +22,12 @@ const Card = ({ title, children, style }) => (
 )
 
 export default function Dashboard() {
-  const { state }   = useLocation()
-  const navigate    = useNavigate()
+  const { state }             = useLocation()
+  const navigate              = useNavigate()
   const [history, setHistory] = useState([])
   const [stats,   setStats]   = useState(null)
   const [loading, setLoading] = useState(true)
-  const result = state?.result
+  const result                = state?.result
 
   useEffect(() => {
     Promise.all([
@@ -40,10 +40,12 @@ export default function Dashboard() {
     })
   }, [])
 
-  // Get previous prediction from history for comparison
   const prevPredicted = history.length > 1
     ? history[history.length - 2]?.predicted
     : result?.predicted * 0.88
+
+  const diff       = prevPredicted ? (result?.predicted - prevPredicted) : 0
+  const diffColor  = diff > 0 ? '#ff6b35' : 'var(--green)'
 
   if (!result) return (
     <div style={{ maxWidth:'900px', margin:'80px auto', textAlign:'center', padding:'24px' }}>
@@ -59,9 +61,6 @@ export default function Dashboard() {
       </button>
     </div>
   )
-
-  const diff = prevPredicted ? (result.predicted - prevPredicted) : 0
-  const diffColor = diff > 0 ? '#ff6b35' : 'var(--green)'
 
   return (
     <div style={{ maxWidth:'1200px', margin:'0 auto', padding:'40px 24px' }}>
@@ -93,10 +92,10 @@ export default function Dashboard() {
       {/* Top KPIs */}
       <div className="fade-up-1" style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:'14px', marginBottom:'24px' }}>
         {[
-          { label:'Prediction',     value:`${result.predicted.toFixed(1)}`,                          unit:'kWh', color:'var(--accent)' },
-          { label:'Vs Last Prediction', value:`${diff >= 0 ? '+' : ''}${diff.toFixed(1)}`,           unit:'kWh', color: diffColor },
-          { label:'Confidence',     value:`${result.confidence ?? 92}`,                               unit:'%',   color:'var(--blue)' },
-          { label:'Model R²',       value: loading ? '...' : stats?.r2?.toFixed(3) ?? '0.620',        unit:'',    color:'var(--green)' },
+          { label:'Prediction',         value:`${result.predicted.toFixed(1)}`,                   unit:'kWh', color:'var(--accent)' },
+          { label:'Vs Last Prediction', value:`${diff >= 0 ? '+' : ''}${diff.toFixed(1)}`,        unit:'kWh', color: diffColor },
+          { label:'Confidence',         value:`${result.confidence ?? 92}`,                        unit:'%',   color:'var(--blue)' },
+          { label:'Model R²',           value: loading ? '...' : stats?.r2?.toFixed(3) ?? '0.620', unit:'',   color:'var(--green)' },
         ].map(({ label, value, unit, color }) => (
           <div key={label} style={{
             background:'var(--bg2)', border:'1px solid var(--border)',
@@ -106,8 +105,12 @@ export default function Dashboard() {
             <div style={{ fontSize:'10px', color:'var(--text3)', letterSpacing:'0.1em',
               textTransform:'uppercase', marginBottom:'8px' }}>{label}</div>
             <div style={{ display:'flex', alignItems:'flex-end', gap:'4px' }}>
-              <span style={{ fontFamily:'var(--font-display)', fontSize:'1.8rem', color, lineHeight:1 }}>{value}</span>
-              <span style={{ fontFamily:'var(--font-mono)', fontSize:'11px', color:'var(--text3)', marginBottom:'3px' }}>{unit}</span>
+              <span style={{ fontFamily:'var(--font-display)', fontSize:'1.8rem', color, lineHeight:1 }}>
+                {value}
+              </span>
+              <span style={{ fontFamily:'var(--font-mono)', fontSize:'11px', color:'var(--text3)', marginBottom:'3px' }}>
+                {unit}
+              </span>
             </div>
           </div>
         ))}
@@ -126,7 +129,7 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      {/* Trend + stats */}
+      {/* Trend + Model Stats */}
       <div className="fade-up-3" style={{ display:'grid', gridTemplateColumns:'2fr 1fr', gap:'20px' }}>
         <Card title="HISTORICAL TREND">
           {loading ? (
@@ -147,6 +150,7 @@ export default function Dashboard() {
           <ModelStats stats={stats} />
         </Card>
       </div>
+
     </div>
   )
 }
